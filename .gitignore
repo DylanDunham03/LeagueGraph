@@ -1,1 +1,9 @@
 .env
+*.exe
+bin/
+
+# Ignore all compiled binaries
+playerService
+/auth-service/auth-service
+/grpc-gateway/grpc-gateway
+/player-graph-service/player-graph-service
