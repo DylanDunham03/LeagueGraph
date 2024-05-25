@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -17,9 +15,9 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, you've reached the Player Graph Service")
-	})
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	fmt.Fprintf(w, "Hello, you've reached the Player Graph Service")
+	// })
 
 	// Fetch matches as part of the service start-up for testing
 	puuid := os.Getenv("SOURCE_PUUID")
@@ -29,13 +27,14 @@ func main() {
 	matches := fetchMatches(puuid, region, apiKey)
 	log.Println("Fetched matches: ", matches)
 
+	uri := os.Getenv("NEO4J_CONN")
+	username := os.Getenv("NEO4J_USER")
+	password := os.Getenv("NEO4J_PASS")
+
 	for _, match := range matches {
-		matchParticipants := fetchMatchData(match, region, apiKey)
-		log.Println(len(matchParticipants))
+		matchData := fetchMatchData(match, region, apiKey)
+		insertPlayerData(matchData, uri, username, password)
 	}
-	// matchParticipants := fetchMatchData(matches[0], region, apiKey)
-	// log.Println("Fetched match participants: ", matchParticipants)
-	// log.Println(len(matchParticipants))
-	// fmt.Println("Player Graph Service listening on http://localhost:8083")
-	// http.ListenAndServe(":8083", nil)
+
+	// wipeDatabase(uri, username, password)
 }
