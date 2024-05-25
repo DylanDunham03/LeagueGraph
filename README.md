@@ -3,6 +3,18 @@
 ### League of Legends friend graph
 
 
+### Getting Starteed
+
+Install:
+
+```
+go get github.com/neo4j/neo4j-go-driver/v4/neo4j
+
+go get github.com/joho/godotenv
+```
+
+
+
 Step 1: Define API Endpoints
 Begin by outlining the API endpoints that your services will expose. This will guide the development of both the backend and the frontend. For instance:
 
