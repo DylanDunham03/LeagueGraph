@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos/playergraphpb"
+	pb "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos"
 
 	"google.golang.org/grpc"
 	// "github.com/neo4j/neo4j-go-driver/v4/neo4j"

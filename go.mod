@@ -7,6 +7,7 @@ require (
 	github.com/neo4j/neo4j-go-driver/v4 v4.4.7
 	google.golang.org/grpc v1.64.0
 	google.golang.org/protobuf v1.34.1
+	// github.com/DylanDunham03/LeagueGraph/player-graph-service/protos/playergraphpb v1.2.3
 )
 
 require (
