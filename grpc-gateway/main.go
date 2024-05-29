@@ -1,15 +1,32 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"context"
+	"log"
+	"net"
+
+	pb "player-graph-service/protos"
+
+	"google.golang.org/grpc"
+	// "github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, you've reached the gRPC Gateway")
-	})
+type serverImpl struct {
+	pb.UnimplementedPlayerGraphServiceServer
+}
 
-	fmt.Println("gRPC Gateway listening on http://localhost:8082")
-	http.ListenAndServe(":8082", nil)
+func (s *serverImpl) GetPlayerGraph(ctx context.Context, req *pb.GraphRequest) (*pb.GraphResponse, error) {
+	// Implementation of fetching data from Neo4j and returning it
+}
+
+func main() {
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	pb.RegisterPlayerGraphServiceServer(s, &serverImpl{})
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }

@@ -11,6 +11,9 @@ Install:
 go get github.com/neo4j/neo4j-go-driver/v4/neo4j
 
 go get github.com/joho/godotenv
+
+go get -u google.golang.org/grpc
+
 ```
 
 

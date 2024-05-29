@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package playergraph;
+import "google/protobuf/empty.proto";
+
+option go_package = "player-graph-service/protos";
+
+service PlayerGraphService {
+    // Defines a RPC method.
+    rpc GetPlayerData (google.protobuf.Empty) returns (PlayerResponse) {}
+    rpc GetPlayerGraph (GraphRequest) returns (GraphResponse);
+}
+
+// The response message containing the data.
+message PlayerResponse {
+    string RiotIdGameName = 1;
+    string RiotIdTagline = 2;
+}
+
+message GraphRequest {
+    string region = 1;
+  }
+
+message GraphResponse {
+    repeated Player players = 1;
+    repeated Connection connections = 2;
+}
+
+message Player {
+    string puuid = 1;
+    string riotIdName = 2;
+    string riotIdGameName = 3;
+    string lastSeen = 4;
+    string role = 5;
+}
+
+message Connection {
+    string playerOneUuid = 1;
+    string playerTwoUuid = 2;
+    string gameId = 3;
+    int32 timesPlayed = 4;
+    string lastPlayed = 5;
+}
