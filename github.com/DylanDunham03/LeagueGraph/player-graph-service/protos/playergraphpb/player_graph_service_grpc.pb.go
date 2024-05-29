@@ -4,7 +4,7 @@
 // - protoc             v5.26.1
 // source: player_graph_service.proto
 
-package protos
+package playergraphpb
 
 import (
 	context "context"

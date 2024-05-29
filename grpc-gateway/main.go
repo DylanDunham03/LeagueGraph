@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"log"
 	"net"
 
-	pb "player-graph-service/protos"
+	pb "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos/playergraphpb"
 
 	"google.golang.org/grpc"
 	// "github.com/neo4j/neo4j-go-driver/v4/neo4j"
@@ -15,9 +15,9 @@ type serverImpl struct {
 	pb.UnimplementedPlayerGraphServiceServer
 }
 
-func (s *serverImpl) GetPlayerGraph(ctx context.Context, req *pb.GraphRequest) (*pb.GraphResponse, error) {
-	// Implementation of fetching data from Neo4j and returning it
-}
+// func (s *serverImpl) GetPlayerGraph(ctx context.Context, req *pb.GraphRequest) (*pb.GraphResponse, error) {
+// 	// Implementation of fetching data from Neo4j and returning it
+// }
 
 func main() {
 	lis, err := net.Listen("tcp", ":50051")

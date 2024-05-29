@@ -3,7 +3,7 @@ syntax = "proto3";
 package playergraph;
 import "google/protobuf/empty.proto";
 
-option go_package = "player-graph-service/protos";
+option go_package = "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos/playergraphpb";
 
 service PlayerGraphService {
     // Defines a RPC method.
