@@ -33,7 +33,7 @@ func main() {
 
 	for _, match := range matches {
 		matchData := fetchMatchData(match, region, apiKey)
-		insertPlayerData(matchData, uri, username, password)
+		insertPlayerData(matchData, region, uri, username, password)
 	}
 
 	// wipeDatabase(uri, username, password)

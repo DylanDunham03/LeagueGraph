@@ -89,7 +89,8 @@ func fetchMatchData(matchId string, region string, apiKey string) MatchDto {
 
 	return match
 }
-func insertPlayerData(match MatchDto, uri string, username string, password string) {
+
+func insertPlayerData(match MatchDto, region string, uri string, username string, password string) {
 	driver, err := neo4j.NewDriver(uri, neo4j.BasicAuth(username, password, ""))
 	if err != nil {
 		log.Fatal("Error creating Neo4j driver: ", err)
@@ -122,7 +123,8 @@ func insertPlayerData(match MatchDto, uri string, username string, password stri
 			_, err := transaction.Run(
 				`MERGE (p:Player {puuid: $puuid})
 				ON CREATE SET p.riotIdGameName = $riotIdGameName, p.riotIdTagline = $riotIdTagline, p.role = $role, p.lastSeen = datetime($lastSeenTime)
-				ON MATCH SET p.riotIdGameName = $riotIdGameName, p.riotIdTagline = $riotIdTagline, p.role = $role, p.lastSeen = datetime($lastSeenTime)`,
+				ON MATCH SET p.riotIdGameName = $riotIdGameName, p.riotIdTagline = $riotIdTagline, p.role = $role, 
+					p.lastSeen = CASE WHEN p.lastSeen < datetime($lastSeenTime) THEN datetime($lastSeenTime) ELSE p.lastSeen END`,
 				map[string]interface{}{
 					"puuid":          participant.Puuid,
 					"riotIdGameName": participant.RiotIdGameName,
@@ -141,13 +143,14 @@ func insertPlayerData(match MatchDto, uri string, username string, password stri
 				_, err = transaction.Run(
 					`MATCH (p1:Player {puuid: $puuid1}), (p2:Player {puuid: $puuid2})
                      MERGE (p1)-[r:PLAYED_WITH]->(p2)
-                     ON CREATE SET r.gameId = $gameId, r.timesPlayed = 1, r.lastPlayed = datetime($lastSeenTime)
+                     ON CREATE SET r.gameId = $gameId, r.timesPlayed = 1, r.lastPlayed = datetime($lastSeenTime), r.region = $region
                      ON MATCH SET r.timesPlayed = r.timesPlayed + 1, r.lastPlayed = datetime($lastSeenTime)`,
 					map[string]interface{}{
 						"puuid1":       match.InfoDto.Participants[i].Puuid,
 						"puuid2":       match.InfoDto.Participants[j].Puuid,
 						"gameId":       match.InfoDto.GameId,
 						"lastSeenTime": lastSeenTime,
+						"region":       region,
 					})
 				if err != nil {
 					log.Printf("Error creating/updating relationship between %s and %s: %v\n", match.InfoDto.Participants[i].Puuid, match.InfoDto.Participants[j].Puuid, err)
