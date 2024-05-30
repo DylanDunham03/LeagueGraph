@@ -1,3 +1,7 @@
+// Compile proto
+// protoc --go_out=. --go-grpc_out=. --proto_path=player-graph-service/protos player-graph-service/protos/player_graph_service.proto
+
+
 syntax = "proto3";
 
 package playergraph;
@@ -40,4 +44,5 @@ message Connection {
     string gameId = 3;
     int32 timesPlayed = 4;
     string lastPlayed = 5;
+    string region = 6;
 }
