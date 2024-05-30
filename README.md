@@ -24,6 +24,12 @@ Graph where players are based on match edges?
 x
 ```
 
+### Compiling in go
+
+```
+go build -o playerService
+./playerService
+```
 
 
 
