@@ -1,0 +1,57 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Player Graph Service",
+            "type": "shell",
+            "command": "go run .",
+            "options": {
+                "cwd": "${workspaceFolder}/player-graph-service"
+            },
+            "presentation": {
+                "panel": "new"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },        
+        {
+            "label": "Start gRPC Gateway",
+            "type": "shell",
+            "command": "go run main.go",
+            "options": {
+                "cwd": "${workspaceFolder}/grpc-gateway"
+            },
+            "presentation": {
+                "panel": "new"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start Auth Service",
+            "type": "shell",
+            "command": "go run .",
+            "options": {
+                "cwd": "${workspaceFolder}/auth-service"
+            },
+            "presentation": {
+                "panel": "new"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start Frontend",
+            "type": "shell",
+            "command": "npm start",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            },
+            "presentation": {
+                "panel": "new"
+            },
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

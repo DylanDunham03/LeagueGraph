@@ -1,18 +1,20 @@
-// Compile proto
-// protoc --go_out=. --go-grpc_out=. --proto_path=player-graph-service/protos player-graph-service/protos/player_graph_service.proto
-
-
 syntax = "proto3";
 
 package playergraph;
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
 
 option go_package = "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos/playergraphpb";
 
 service PlayerGraphService {
     // Defines a RPC method.
     rpc GetPlayerData (google.protobuf.Empty) returns (PlayerResponse) {}
-    rpc GetPlayerGraph (GraphRequest) returns (GraphResponse);
+    rpc GetPlayerGraph (GraphRequest) returns (GraphResponse){
+        option (google.api.http) = {
+            get: "/v1/playergraph/{region}"
+        };
+    }
 }
 
 // The response message containing the data.
@@ -46,3 +48,28 @@ message Connection {
     string lastPlayed = 5;
     string region = 6;
 }
+
+// Compile Protobuf
+// protoc -I player-graph-service/protos \                     
+//        -I third_party/google/api \              
+//        --go_out=player-graph-service/protos --go_opt=paths=source_relative \
+//        --go-grpc_out=player-graph-service/protos --go-grpc_opt=paths=source_relative \
+//        --grpc-gateway_out=player-graph-service/protos --grpc-gateway_opt=paths=source_relative,logtostderr=true \
+//        player-graph-service/protos/player_graph_service.proto
+// protoc -I player-graph-service/protos \
+//        -I player-graph-service/protos/google/api \
+//        player-graph-service/protos/player_graph_service.proto \
+//        --js_out=import_style=commonjs:frontend/src/protos \
+//        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:frontend/src/protos
+
+
+
+// protoc -I=player-graph-service/protos \
+//        player-graph-service/protos/google/api/annotations.proto \
+//        --js_out=import_style=commonjs:frontend/src/protos \
+//        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:frontend/src/protos
+
+// protoc -I=player-graph-service/protos \
+//        player-graph-service/protos/google/api/http.proto \
+//        --js_out=import_style=commonjs:frontend/src/protos \
+//        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:frontend/src/protos

@@ -14,6 +14,9 @@ go get github.com/joho/godotenv
 
 go get -u google.golang.org/grpc
 
+go get github.com/rs/cors
+
+
 ```
 
 
@@ -28,7 +31,6 @@ x
 
 ```
 go build -o playerService
-./playerService
 ```
 
 

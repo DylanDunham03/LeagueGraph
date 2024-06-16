@@ -2,87 +2,43 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
-	"net"
-	"os"
+	"net/http"
 
 	pb "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos"
-	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/rs/cors"
 	"google.golang.org/grpc"
 )
 
-type serverImpl struct {
-	pb.UnimplementedPlayerGraphServiceServer
-	neo4jDriver neo4j.Driver
-}
+func run() error {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
-func (s *serverImpl) GetPlayerGraph(ctx context.Context, req *pb.GraphRequest) (*pb.GraphResponse, error) {
-	session := s.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeRead})
-	defer session.Close()
-
-	result, err := session.Run(`
-        MATCH (p:Player)-[r:PLAYED_WITH {region: $region}]-(q:Player)
-        RETURN p, r, q
-    `, map[string]interface{}{"region": req.Region})
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	err := pb.RegisterPlayerGraphServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var response pb.GraphResponse
-	for result.Next() {
-		record := result.Record()
-		p := record.Values[0].(neo4j.Node)
-		r := record.Values[1].(neo4j.Relationship)
-		q := record.Values[2].(neo4j.Node)
+	// Setup CORS
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // This will allow any domain, adjust if necessary
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"*"}, // Or you can specify headers you want to allow
+		AllowCredentials: true,
+		Debug:            true, // Shows detailed logs of CORS operations
+	}).Handler(mux)
 
-		playerOne := pb.Player{
-			Puuid:          p.Props["puuid"].(string),
-			RiotIdName:     p.Props["riotIdName"].(string),
-			RiotIdGameName: p.Props["riotIdGameName"].(string),
-			LastSeen:       p.Props["lastSeen"].(string),
-			Role:           p.Props["role"].(string),
-		}
-		playerTwo := pb.Player{
-			Puuid:          q.Props["puuid"].(string),
-			RiotIdName:     q.Props["riotIdName"].(string),
-			RiotIdGameName: q.Props["riotIdGameName"].(string),
-			LastSeen:       q.Props["lastSeen"].(string),
-			Role:           q.Props["role"].(string),
-		}
-		connection := pb.Connection{
-			PlayerOneUuid: playerOne.Puuid,
-			PlayerTwoUuid: playerTwo.Puuid,
-			GameId:        r.Props["gameId"].(string),
-			TimesPlayed:   int32(r.Props["timesPlayed"].(int)),
-			LastPlayed:    r.Props["lastPlayed"].(string),
-			Region:        req.Region,
-			// Region:        r.Props["region"].(string),
-		}
-
-		response.Players = append(response.Players, &playerOne, &playerTwo)
-		response.Connections = append(response.Connections, &connection)
-	}
-
-	return &response, nil
+	return http.ListenAndServe(":8080", corsHandler)
 }
 
 func main() {
-	uri := os.Getenv("NEO4J_CONN")
-	username := os.Getenv("NEO4J_USER")
-	password := os.Getenv("NEO4J_PASS")
-	driver, err := neo4j.NewDriver(uri, neo4j.BasicAuth(username, password, ""))
-	if err != nil {
-		log.Fatalf("Error creating Neo4j driver: %v", err)
-	}
-	defer driver.Close()
-
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
-	grpcServer := grpc.NewServer()
-	pb.RegisterPlayerGraphServiceServer(grpcServer, &serverImpl{neo4jDriver: driver})
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
+	flag.Parse()
+	if err := run(); err != nil {
+		log.Fatalf("Failed to start HTTP gateway: %v", err)
 	}
 }
