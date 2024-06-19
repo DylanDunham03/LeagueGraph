@@ -9,11 +9,19 @@ option go_package = "github.com/DylanDunham03/LeagueGraph/player-graph-service/p
 
 service PlayerGraphService {
     // Defines a RPC method.
-    rpc GetPlayerData (google.protobuf.Empty) returns (PlayerResponse) {}
+    rpc GetPlayerData (google.protobuf.Empty) returns (PlayerResponse) {
+        option (google.api.http) = {
+            get: "/v1/playerdata"
+        };
+    }
     rpc GetPlayerGraph (GraphRequest) returns (GraphResponse){
         option (google.api.http) = {
             get: "/v1/playergraph/{region}"
         };
+        // option (google.api.http) = {
+        //     post: "/v1/playergraph/{region}"
+        //     body: "*"
+        // };
     }
 }
 
@@ -73,3 +81,19 @@ message Connection {
 //        player-graph-service/protos/google/api/http.proto \
 //        --js_out=import_style=commonjs:frontend/src/protos \
 //        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:frontend/src/protos
+
+
+// I think this one
+// protoc -I=player-graph-service/protos \
+//        -I=player-graph-service/protos/google/api \
+//        --js_out=import_style=commonjs:frontend/src/protos \
+//        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:frontend/src/protos \
+//        player-graph-service/protos/player_graph_service.proto
+
+
+// protoc -I=player-graph-service/protos \
+//        -I=player-graph-service/protos/google/api \
+//        --go_out=player-graph-service/protos --go_opt=paths=source_relative \
+//        --go-grpc_out=player-graph-service/protos --go-grpc_opt=paths=source_relative \
+//        --grpc-gateway_out=player-graph-service/protos --grpc-gateway_opt=paths=source_relative,logtostderr=true \
+//        player-graph-service/protos/player_graph_service.proto

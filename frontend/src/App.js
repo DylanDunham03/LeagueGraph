@@ -4,6 +4,7 @@ import { getPlayerGraph } from './api/PlayerGraphService';
 function App() {
   const [graphData, setGraphData] = useState(null);
 
+  console.log(`Starting getPlayerGraph`);
   useEffect(() => {
     getPlayerGraph('americas')
       .then(data => {
@@ -13,6 +14,7 @@ function App() {
       .catch(error => {
         console.error('Error fetching graph data:', error);
       });
+      console.log(`Ending getPlayerGraph`);
   }, []);
 
   return (

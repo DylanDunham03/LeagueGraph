@@ -33,7 +33,10 @@ x
 go build -o playerService
 ```
 
-
+### Testing Player-graph-service and grpc-gateway
+```
+LeagueGraph % curl -X GET "http://localhost:8080/v1/playergraph/americas"
+```
 
 Step 1: Define API Endpoints
 Begin by outlining the API endpoints that your services will expose. This will guide the development of both the backend and the frontend. For instance:

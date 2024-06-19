@@ -6,13 +6,18 @@ export const getPlayerGraph = async (region) => {
   const request = new GraphRequest();
   request.setRegion(region);
 
+  console.log(`Requesting data for region: ${region}`);
+
   return new Promise((resolve, reject) => {
-    client.getPlayerGraph(request, {}, (err, response) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(response.toObject());
-      }
-    });
+      client.getPlayerGraph(request, {}, (err, response) => {
+          if (err) {
+              console.error("Error in gRPC call:", err);
+              reject(err);
+          } else {
+              console.log("Received response:", response.toObject());
+              resolve(response.toObject());
+          }
+      });
   });
 };
+

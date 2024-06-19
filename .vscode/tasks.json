@@ -15,11 +15,11 @@
             "problemMatcher": []
         },        
         {
-            "label": "Start gRPC Gateway",
+            "label": "Start gRPC Gateway (Envoy)",
             "type": "shell",
-            "command": "go run main.go",
+            "command": "envoy -c envoy.yaml",
             "options": {
-                "cwd": "${workspaceFolder}/grpc-gateway"
+                "cwd": "${workspaceFolder}/config"
             },
             "presentation": {
                 "panel": "new"
@@ -27,6 +27,20 @@
             "group": "build",
             "problemMatcher": []
         },
+        {
+            "label": "Stop gRPC Gateway (Envoy)",
+            "type": "shell",
+            "command": "pgrep -f 'envoy -c envoy.yaml' | xargs kill",
+            "options": {
+                "cwd": "${workspaceFolder}/config"
+            },
+            "presentation": {
+                "panel": "shared",
+                "reveal": "always"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },        
         {
             "label": "Start Auth Service",
             "type": "shell",

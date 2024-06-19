@@ -3,9 +3,13 @@
 package main
 
 import (
+	"strconv"
+
 	pb "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
+
 	// "log"
+	"time"
 )
 
 type Neo4jClient struct {
@@ -13,12 +17,41 @@ type Neo4jClient struct {
 }
 
 func mapNeo4jNodeToPlayerProto(node neo4j.Node) pb.Player {
+	LastSeen := ""
+	if lastSeen, ok := node.Props["lastSeen"].(time.Time); ok {
+		LastSeen = lastSeen.Format(time.RFC3339) // Converts time.Time to a RFC 3339 formatted string
+	}
+
 	return pb.Player{
 		Puuid:          node.Props["puuid"].(string),
 		RiotIdName:     node.Props["riotIdTagline"].(string),
 		RiotIdGameName: node.Props["riotIdGameName"].(string),
-		LastSeen:       node.Props["lastSeen"].(string),
+		LastSeen:       LastSeen,
 		Role:           node.Props["role"].(string),
+	}
+}
+
+func mapNeo4jRelationshipToConnProto(r neo4j.Relationship, region string) pb.Connection {
+	gameId := ""
+	if id, ok := r.Props["gameId"].(int64); ok {
+		gameId = strconv.FormatInt(id, 10)
+	}
+
+	timesPlayed := int32(-1)
+	if tp, ok := r.Props["timesPlayed"].(int64); ok {
+		timesPlayed = int32(tp)
+	}
+
+	LastPlayed := ""
+	if lastPlayed, ok := r.Props["lastPlayed"].(time.Time); ok {
+		LastPlayed = lastPlayed.Format(time.RFC3339)
+	}
+
+	return pb.Connection{
+		GameId:      gameId,
+		TimesPlayed: timesPlayed,
+		LastPlayed:  LastPlayed,
+		Region:      region,
 	}
 }
 
@@ -52,15 +85,9 @@ func (client *Neo4jClient) GetPlayerGraph(region string) (*pb.GraphResponse, err
 		// Assuming a function mapNeo4jNodeToPlayerProto exists and converts Neo4j Node to Player protobuf
 		playerOne := mapNeo4jNodeToPlayerProto(p)
 		playerTwo := mapNeo4jNodeToPlayerProto(q)
-
-		connection := pb.Connection{
-			PlayerOneUuid: playerOne.Puuid,
-			PlayerTwoUuid: playerTwo.Puuid,
-			GameId:        r.Props["gameId"].(string),
-			TimesPlayed:   int32(r.Props["timesPlayed"].(int)),
-			LastPlayed:    r.Props["lastPlayed"].(string),
-			Region:        region,
-		}
+		connection := mapNeo4jRelationshipToConnProto(r, region)
+		connection.PlayerOneUuid = playerOne.Puuid
+		connection.PlayerTwoUuid = playerTwo.Puuid
 
 		response.Players = append(response.Players, &playerOne, &playerTwo)
 		response.Connections = append(response.Connections, &connection)

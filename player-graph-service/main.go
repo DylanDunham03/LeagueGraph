@@ -9,6 +9,7 @@ import (
 	pb "github.com/DylanDunham03/LeagueGraph/player-graph-service/protos" // import the protobuf package
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 // func main() {
@@ -61,6 +62,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 	pb.RegisterPlayerGraphServiceServer(s, &serverImpl{neo4jClient: neo4jClient})
+	reflection.Register(s)
 	log.Printf("Server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
