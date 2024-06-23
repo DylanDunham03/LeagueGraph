@@ -18,10 +18,6 @@ service PlayerGraphService {
         option (google.api.http) = {
             get: "/v1/playergraph/{region}"
         };
-        // option (google.api.http) = {
-        //     post: "/v1/playergraph/{region}"
-        //     body: "*"
-        // };
     }
 }
 
