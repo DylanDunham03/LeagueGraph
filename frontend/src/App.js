@@ -10,16 +10,6 @@ function AppContent() {
     const networkContainer = useRef(null);
     const [graphData, setGraphData] = useState(null);
 
-    // useEffect(() => {
-    //   if (graphData == null) {  // Only fetch if graphData is not already loaded
-    //     getPlayerGraph('americas')
-    //       .then(data => {
-    //         setGraphData(data);
-    //         isDataFetched.current = true;  // Mark data as fetched
-    //       })
-    //       .catch(error => console.error('Error fetching graph data:', error));
-    //   }
-    // }, [graphData]);
     useEffect(() => {
       // Attempt to load graph data from localStorage first
       const savedGraphData = localStorage.getItem('graphData');
@@ -59,12 +49,20 @@ function AppContent() {
     };
 
     return (
-        <div className={theme}>
-            <h1 style={{ textAlign: 'center' }}>Player Graph</h1>
-            <button onClick={toggleTheme}>Toggle Theme</button>
+        <div className={`${theme} flex flex-col items-center justify-center min-h-screen`}>
+            <div className="absolute top-0 right-0 p-4">
+                <button onClick={toggleTheme} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Toggle Theme
+                </button>
+            </div>
+            <h1 className="text-4xl mb-4">Player Graph</h1>
             <div ref={networkContainer} style={{ height: '500px', width: '100%' }} />
+            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Sign In
+            </button>
         </div>
     );
+
 }
 
 function App() {

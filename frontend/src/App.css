@@ -14,16 +14,19 @@
 }
 
 .App-header {
+  position: relative; /* Set position relative for the parent container */
+  height: 100vh;
   background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
 }
 
+.title {
+  position: absolute;
+  top: 10px; /* Adjust this value to move the title up */
+  left: 50%;
+  transform: translateX(-50%); /* Center align the title horizontally */
+  width: 100%; /* Gives full width to align text in center */
+}
 .App-link {
   color: #61dafb;
 }
