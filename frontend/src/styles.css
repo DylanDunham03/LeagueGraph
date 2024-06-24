@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* 
+.btn-blue {
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+}
+
+.btn-green {
+    @apply bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded;
+} */
+
+.txt-general {
+    @apply text-3xl font-bold;
+}
+
+.btn-blue {
+    @apply bg-blue-700 hover:bg-blue-600 text-white font-bold py-3 px-6 
+    flex items-center 
+    space-x-4
+    rounded transition duration-150 ease-in-out shadow-lg;
+    
+}
+
+.btn-green {
+    @apply bg-green-500 hover:bg-green-400 text-white font-bold py-3 px-6 rounded transition duration-150 ease-in-out shadow-lg;
+}
