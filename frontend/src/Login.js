@@ -4,6 +4,10 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { getPlayerGraph } from "./api/PlayerGraphService";
 import { renderNetwork } from "./components/displayGraph";
 import { calculateLocalStorageSize } from "./components/utils";
+import GoogleSignInButton from "./components/GoogleSignInButton";
+
+import { AuthServiceClient } from "../protos/auth_grpc_web_pb";
+import { GoogleSignInRequest } from "../protos/auth_pb";
 
 //Styling
 import "./styles.css";
@@ -21,6 +25,7 @@ function Login() {
   const { theme, setTheme } = useTheme();
   const networkContainer = useRef(null);
   const [graphData, setGraphData] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Attempt to load graph data from localStorage first
@@ -57,8 +62,38 @@ function Login() {
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
+
   const signInWithGoogle = () => {
     console.log("Sign in with Google triggered"); // Replace with your auth logic
+  };
+
+  const handleSignInSuccess = (credential) => {
+    const client = new AuthServiceClient('http://localhost:8080/auth');
+    const request = new GoogleSignInRequest();
+    request.setIdToken(credential);
+
+    client.googleSignIn(request, {}, (err, response) => {
+      if (err) {
+        console.error("Error during sign in:", err);
+        return;
+      }
+      if (response.getSuccess()) {
+        console.log("Sign in successful. User ID:", response.getUserId());
+        localStorage.setItem('sessionToken', response.getSessionToken());
+        setUser({ id: response.getUserId() });
+        // You might want to fetch user data or redirect here
+      } else {
+        console.error("Sign in failed:", response.getError());
+      }
+    });
+  };
+
+  const handleSignInError = (error) => {
+    console.error("Google Sign-In error:", error);
+  };
+  const handleSignOut = () => {
+    localStorage.removeItem('sessionToken');
+    setUser(null);
   };
 
   return (
@@ -69,25 +104,33 @@ function Login() {
         <button onClick={toggleTheme} className="btn-green">
           Toggle Theme
         </button>
-        <button onClick={signInWithGoogle} className="btn-blue">
-          Sign In
-        </button>
+        <GoogleSignInButton
+          onSuccess={handleSignInSuccess}
+          onError={handleSignInError}
+        >
+          <button className="btn-blue">Sign In</button>
+        </GoogleSignInButton>
       </div>
-      <h1 className={`txt-general ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+      <h1
+        className={`txt-general ${
+          theme === "dark" ? "text-white" : "text-black"
+        }`}
+      >
         League Friend Graph
       </h1>
       <div ref={networkContainer} style={{ height: "500px", width: "100%" }} />
-      <button
-        onClick={signInWithGoogle}
-        //   className={style.loginBtn}
-        className="btn-blue"
+      <GoogleSignInButton
+        onSuccess={handleSignInSuccess}
+        onError={handleSignInError}
       >
-        <img
-          className="h-6 w-6"
-          src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
-        />
-        <span className={style.loginBtnText}>Sign in with Google</span>
-      </button>
+        <button className="btn-blue">
+          <img
+            className="h-6 w-6"
+            src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
+          />
+          <span className={style.loginBtnText}>Sign in with Google</span>
+        </button>
+      </GoogleSignInButton>
     </div>
   );
 }

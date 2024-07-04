@@ -31,11 +31,15 @@ static_resources:
                         - match:
                             prefix: "/v1/playergraph/"
                           route:
-                            cluster: grpc_server
+                            cluster: player_graph_service
+                        - match:
+                            prefix: "/auth/"
+                          route:
+                            cluster: auth_service
                         - match:
                             prefix: "/"  # Default catch-all handler
                           route:
-                            cluster: grpc_server
+                            cluster: player_graph_service
                       
                 http_filters:
                   - name: envoy.filters.http.grpc_web
@@ -48,13 +52,29 @@ static_resources:
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: grpc_server
+    - name: auth_service
       connect_timeout: 0.25s
       type: LOGICAL_DNS
       lb_policy: ROUND_ROBIN
       http2_protocol_options: {}
       load_assignment:
-        cluster_name: grpc_server
+        cluster_name: auth_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 127.0.0.1
+                      port_value: 50052
+                      
+  clusters:
+    - name: player_graph_service
+      connect_timeout: 0.25s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: player_graph_service
         endpoints:
           - lb_endpoints:
               - endpoint:

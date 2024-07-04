@@ -16,6 +16,14 @@ go get -u google.golang.org/grpc
 
 go get github.com/rs/cors
 
+go get github.com/go-sql-driver/mysql
+
+go get github.com/dgrijalva/jwt-go
+
+go get golang.org/x/oauth2/google
+
+go get -u google.golang.org/api/oauth2/v2
+
 
 ```
 

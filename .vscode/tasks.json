@@ -13,7 +13,20 @@
             },
             "group": "build",
             "problemMatcher": []
-        },        
+        }, 
+        {
+            "label": "Start Auth Service",
+            "type": "shell",
+            "command": "go run .",
+            "options": {
+                "cwd": "${workspaceFolder}/auth-service"
+            },
+            "presentation": {
+                "panel": "new"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },         
         {
             "label": "Start gRPC Gateway (Envoy)",
             "type": "shell",
